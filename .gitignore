@@ -1,0 +1,79 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+
+# --- Poetry / виртуалки ---
+# Локальное окружение в корне проекта (рекомендуется poetry config ниже)
+.venv/
+# Кэш Poetry
+.poetry-cache/
+# Не игнорируй poetry.lock — его НУЖНО коммитить для приложений
+
+# --- Тесты / отчёты ---
+.coverage
+htmlcov/
+coverage.xml
+.pytest_cache/
+.tox/
+.nox/
+.mypy_cache/
+.pytype/
+.dmypy.json
+.pyre/
+pytestdebug.log
+
+# --- Jupyter / данных ---
+.ipynb_checkpoints/
+.jupyter/
+# Сырые/временные данные
+data/**/*
+!data/.gitkeep
+*.sqlite3
+
+# --- Логи / временные ---
+*.log
+*.tmp
+*.temp
+*.out
+
+# --- Конфиги с секретами ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# --- IDE / редакторы ---
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+# JetBrains
+.idea/
+# PyCharm/IntelliJ misc
+*.iml
+
+# --- OS мусор ---
+.DS_Store
+Thumbs.db
+
+# --- Докер/контейнеры ---
+.docker/
+docker/*.env
+docker/**/tmp/
+
+# --- PyInstaller ---
+*.manifest
+*.spec
+
+# --- Type checking / JS tooling (если есть фронт) ---
+node_modules/
