@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS main.users (
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
 
   CONSTRAINT email_len CHECK (length(email) <= 254)
+  CONSTRAINT u_users_email UNIQUE (email)
 );
 COMMIT;
 
