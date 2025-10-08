@@ -15,4 +15,9 @@ class Settings(BaseSettings):
     db_name : str 
     db_port : str 
 
+    jwt_secret: str = "dev_change_me"
+    jwt_alg: str = "HS256"
+    access_token_expire_min: int = 30
+    refresh_token_expire_days: int = 14
+
 settings = Settings()

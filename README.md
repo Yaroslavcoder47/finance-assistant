@@ -89,3 +89,38 @@ python -m app.main
 - Детализация чеков (`receipt_items`) и сплит по категориям
 - Бюджеты, кэш балансов, расширенная аналитика
 - Логи ML и мониторинг качества извлечения
+
+---
+
+## Use-case диаграмма
+
+Диаграмма демонстрирует основные сценарии взаимодействия пользователя с системой: добавление расходов вручную, загрузку чеков с автоматическим извлечением данных (OCR/ML), категоризацию транзакций и получение аналитических советов.
+
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="docs/use-case-diagram.png" alt="Use-case Diagram" width="800"/>
+    </td>
+  </tr>
+</table>
+
+<br><br>
+<b>Варианты использования для роли «Неавторизованный пользователь»</b>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="docs/not-authorized-user.png" alt="not-authorized-user diagram" width="800"/>
+    </td>
+  </tr>
+</table>
+
+<br><br>
+<b>Варианты использования для роли «Администратор»</b>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="docs/admin-user.png" alt="admin-user diagram" width="800"/>
+    </td>
+  </tr>
+</table>
