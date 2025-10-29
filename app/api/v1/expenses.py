@@ -63,6 +63,7 @@ def create_expense(body : ExpenseCreate, request : Request):   #### HARDCODE Ð·Ð
             """,
             (user_id, account_id, body.amount, body.date, body.description, datetime.now(timezone.utc))
         )
+    logger.info(f"Expense for {email} was created")
     return {"Create expense": "OK"}
 
 
