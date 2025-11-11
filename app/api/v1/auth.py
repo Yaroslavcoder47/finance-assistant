@@ -3,7 +3,8 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Depends
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.jwt import auth
@@ -21,11 +22,15 @@ from app.schemas.auth import (
 )
 from app.utils.mail_sender import send_code
 from app.utils.security import hash_code, hash_password, sha256, verify_password
+from app.db.models import *
+from app.db.database import get_db
+
 
 router = APIRouter()
 logger = logging.getLogger("app.auth")
 
 
+### HELPER FUNCTIONS
 def _store_refresh(user_id: int, refresh_token: str, jti: str, exp_utc: datetime) -> None:
     logger.debug(f"Refresh token for {user_id} was stored in DB")
     with get_connection() as conn, conn.cursor() as cur:
@@ -98,8 +103,9 @@ def _is_refresh_active(email: str, refresh_token: str, jti: str) -> tuple[bool, 
         return (active, user_id if active else None)
 
 
+### ENDPOINTS
 @router.post("/request-code", response_model=RequestCodeOut, summary="Send code on email")
-def request_code(body: EmailIn):
+def request_code(body: EmailIn, db: Session = Depends(get_db)):
     email = body.email.lower()
     logger.debug(f"Request code for {email}")
     code = f"{secrets.randbelow(1_000_000):06d}"
@@ -107,21 +113,20 @@ def request_code(body: EmailIn):
     expires = datetime.now(timezone.utc) + timedelta(minutes=5)
 
     logger.debug("Insert into 'email_codes' new row")
-    with get_connection() as conn, conn.cursor() as cur:
-        cur.execute(
-            """
-            INSERT INTO main.email_codes 
-            (email, code_hash, expires_at, attempts_left, used, verified_at)
-            VALUES (%s, %s, %s, 5, FALSE, NULL)
-            ON CONFLICT (email) DO UPDATE SET
-              code_hash = EXCLUDED.code_hash,
-              expires_at = EXCLUDED.expires_at,
-              attempts_left = 5,
-              used = FALSE,
-              verified_at = NULL
-        """,
-            (email, code_h, expires),
-        )
+    
+    existing_row = db.query(EmailCode).filter(EmailCode.email == email).first()
+
+    if existing_row:
+        existing_row.code_hash = code_h
+        existing_row.expires_at = expires
+        existing_row.attempts_left = 5
+    else:
+        email_code = EmailCode(email=email, code_hash=code_h, expires_at=expires)
+        db.add(email_code)
+
+    db.commit()
+    if existing_row:
+        db.refresh(existing_row)
 
     logger.info(f"[DEV] send code {code} to {email}")
     try:
@@ -132,48 +137,38 @@ def request_code(body: EmailIn):
 
 
 @router.post("/verify-code", response_model=CodeVerifyOut, summary="Verify code from email")
-def verify_code(body: CodeVerifyIn):
+def verify_code(body: CodeVerifyIn, db: Session = Depends(get_db)):
     email = body.email.lower()
     logger.debug(f"Code verification for {email}")
     code_h = hash_code(body.code)
     now = datetime.now(timezone.utc)
 
     logger.debug("Execute row from 'email_codes'")
-    with get_connection() as conn, conn.cursor() as cur:
-        cur.execute(
-            """
-            SELECT code_hash, expires_at, attempts_left, used
-            FROM main.email_codes WHERE email = %s
-        """,
-            (email,),
-        )
-
-        row = cur.fetchone()
-        if not row:
-            logger.exception("Request the code")
-            raise HTTPException(400, "Request the code")
-        db_hash, expires_at, attempts_left, used = row
-        if used:
-            logger.exception("Code have been used")
-            raise HTTPException(400, "Code have been used")
-        if expires_at < now:
-            logger.exception("The code has expired")
-            raise HTTPException(400, "The code has expired")
-        if attempts_left <= 0:
-            logger.exception("The number of attempts has been exceeded")
-            raise HTTPException(400, "The number of attempts has been exceeded")
-        if code_h != db_hash:
-            logger.exception("Invalid code")
-            cur.execute(
-                "UPDATE main.email_codes SET attempts_left = attempts_left - 1 WHERE email = %s",
-                (email,),
-            )
-            raise HTTPException(400, "Invalid code")
-
-        cur.execute(
-            "UPDATE main.email_codes SET used = TRUE, verified_at = %s WHERE email = %s",
-            (now, email),
-        )
+    email_code = db.query(EmailCode).filter(EmailCode.email == email).first()
+    
+    if not email_code:
+        logger.exception("Request the code")
+        raise HTTPException(400, "Request the code")
+    if email_code.used:
+        logger.exception("Code have been used")
+        raise HTTPException(400, "Code have been used")
+    if email_code.expires_at < now:
+        logger.exception("The code has expired")
+        raise HTTPException(400, "The code has expired")
+    if email_code.attempts_left <= 0:
+        logger.exception("The number of attempts has been exceeded")
+        raise HTTPException(400, "The number of attempts has been exceeded")
+    if email_code.code_hash != code_h:
+        logger.exception("Invalid code")
+        email_code.attempts_left -= 1
+        db.commit()
+        db.refresh(email_code)
+        raise HTTPException(400, "Invalid code")
+    
+    email_code.used = True
+    email_code.verified_at = now
+    db.commit()
+    db.refresh(email_code)
 
     return CodeVerifyOut(verified=True)
 
