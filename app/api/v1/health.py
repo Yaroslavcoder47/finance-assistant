@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from app.db.psycopg import get_connection
 from app.db.models import *
-from app.db.database import get_db, database_engine
+from app.db.database import database_engine
 from sqlalchemy import inspect
 
 router = APIRouter()
