@@ -110,6 +110,7 @@ def request_code(body: EmailIn, db: Session = Depends(get_db)):
         existing_row.code_hash = code_h
         existing_row.expires_at = expires
         existing_row.attempts_left = 5
+        existing_row.used = False
     else:
         email_code = EmailCode(email=email, code_hash=code_h, expires_at=expires)
         db.add(email_code)
