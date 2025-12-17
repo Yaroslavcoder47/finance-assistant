@@ -249,6 +249,8 @@ def refresh_tokens(payload: RefreshIn, response: Response, db: Session = Depends
 @router.post("/logout", summary="Revoke refresh token(logout)")
 def logout(body: LogoutIn, response: Response, db: Session = Depends(get_db)):
     logger.info("User in trying to logout")
+
+    #### TODO вытянуть refresh_token из БД по вытянутому access_token из куки
     try:
         data = _decode_refresh_or_401(body.refresh_token)
     except Exception:
@@ -257,5 +259,5 @@ def logout(body: LogoutIn, response: Response, db: Session = Depends(get_db)):
 
     if data.get("type") == "refresh" and "jti" in data:
         _revoke_refresh_by_jti(data["jti"], db)
-        response.delete_cookie(key=auth.config.JWT_ACCESS_COOKIE_NAME)
+    response.delete_cookie(key=auth.config.JWT_ACCESS_COOKIE_NAME)
     return {"ok": True}
