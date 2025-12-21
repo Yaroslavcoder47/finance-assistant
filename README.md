@@ -37,18 +37,20 @@ poetry run python -m app.main
 ```
 
 ---
+
 ## API — Swagger UI / OpenAPI
 
 **Ссылки (локально):**
+
 - Swagger UI: `http://localhost:8000/docs`
 
 **Базовый префикс API:** `/api/v1`
 
 ### Авторизация в Swagger UI (Bearer JWT)
 
-1) Пройди флоу: `request-code` → `verify-code` → `set-password` → `login`.  
-2) Возьми **access token** из ответа `login`.  
-3) В Swagger нажми **Authorize** → введи `Bearer <access_token>` → **Authorize**.  
+1) Пройди флоу: `request-code` → `verify-code` → `set-password` → `login`.
+2) Возьми **access token** из ответа `login`.
+3) В Swagger нажми **Authorize** → введи `Bearer <access_token>` → **Authorize**.
 4) Дальше защищённые эндпоинты вызываются с заголовком `Authorization: Bearer <access_token>`.
 
 ---
@@ -56,66 +58,73 @@ poetry run python -m app.main
 ### Эндпоинты (как в Swagger UI)
 
 #### `health`
-| Метод | Путь                                    | Описание                            |
-|------:|-----------------------------------------|-------------------------------------|
-| GET   | `/api/v1/health`                        | Health                              |
-| GET   | `/api/v1/health/db`                     | Db Health                           |
-| GET   | `/api/v1/health/db/auth/email_codes`    | Check Auth (email codes)            |
-| GET   | `/api/v1/health/db/auth/refresh_tokens` | Check Auth (refresh tokens)         |
-| GET   | `/api/v1/health/db/auth/users`          | Check Auth (users)                  |
-| GET   | `/api/v1/health/readiness`              | Readiness                           |
+
+| Метод | Путь                                  | Описание            |
+| ---------: | ----------------------------------------- | --------------------------- |
+|        GET | `/api/v1/health`                        | Health                      |
+|        GET | `/api/v1/health/db`                     | Db Health                   |
+|        GET | `/api/v1/health/db/auth/email_codes`    | Check Auth (email codes)    |
+|        GET | `/api/v1/health/db/auth/refresh_tokens` | Check Auth (refresh tokens) |
+|        GET | `/api/v1/health/db/auth/users`          | Check Auth (users)          |
+|        GET | `/api/v1/health/readiness`              | Readiness                   |
 
 #### `auth`
-| Метод | Путь                   | Описание                                      |
-|------:|------------------------|-----------------------------------------------|
-| POST  | `/api/v1/request-code` | Отправить код на email                        |
-| POST  | `/api/v1/verify-code`  | Проверить код из email                        |
-| POST  | `/api/v1/set-password` | Установить пароль и получить JWT              |
-| POST  | `/api/v1/login`        | Вход (email + password) → access/refresh      |
-| POST  | `/api/v1/refresh`      | Обновить access/refresh по refresh            |
-| POST  | `/api/v1/logout`       | Logout (отозвать refresh-токен)               |
+
+| Метод | Путь                 | Описание                                          |
+| ---------: | ------------------------ | --------------------------------------------------------- |
+|       POST | `/api/v1/request-code` | Отправить код на email                      |
+|       POST | `/api/v1/verify-code`  | Проверить код из email                      |
+|       POST | `/api/v1/set-password` | Установить пароль и получить JWT |
+|       POST | `/api/v1/login`        | Вход (email + password) → access/refresh             |
+|       POST | `/api/v1/refresh`      | Обновить access/refresh по refresh              |
+|       POST | `/api/v1/logout`       | Logout (отозвать refresh-токен)              |
 
 #### `expenses`
-| Метод | Путь                    | Описание                       |
-|------:|-------------------------|--------------------------------|
-| GET   | `/api/v1/expenses`      | Get Expenses                   |
-| POST  | `/api/v1/expenses`      | Create Expense                 |
-| GET   | `/api/v1/expenses/{id}` | Get Expense By Id              |
-| PATCH | `/api/v1/expenses/{id}` | Update Expense (partial)       |
-| DELETE| `/api/v1/expenses/{id}` | Delete Expense                 |
+
+| Метод | Путь                  | Описание         |
+| ---------: | ------------------------- | ------------------------ |
+|        GET | `/api/v1/expenses`      | Get Expenses             |
+|       POST | `/api/v1/expenses`      | Create Expense           |
+|        GET | `/api/v1/expenses/{id}` | Get Expense By Id        |
+|      PATCH | `/api/v1/expenses/{id}` | Update Expense (partial) |
+|     DELETE | `/api/v1/expenses/{id}` | Delete Expense           |
 
 #### `receipts`
-| Метод | Путь               | Описание    |
-|------:|--------------------|-------------|
-| POST  | `/api/v1/receipts` | Add Receipt |
+
+| Метод | Путь             | Описание |
+| ---------: | -------------------- | ---------------- |
+|       POST | `/api/v1/receipts` | Add Receipt      |
 
 #### `analytics`
-| Метод | Путь                            | Описание                     |
-|------:|---------------------------------|------------------------------|
-| GET   | `/api/v1/analytics/timeseries`  | Get Timeseries               |
-| GET   | `/api/v1/analytics/by-category` | Get Timeseries By Category   |
+
+| Метод | Путь                          | Описание           |
+| ---------: | --------------------------------- | -------------------------- |
+|        GET | `/api/v1/analytics/timeseries`  | Get Timeseries             |
+|        GET | `/api/v1/analytics/by-category` | Get Timeseries By Category |
 
 #### `categories`
-| Метод | Путь                 | Описание      |
-|------:|----------------------|---------------|
-| GET   | `/api/v1/categories` | Get Statistic |
+
+| Метод | Путь               | Описание |
+| ---------: | ---------------------- | ---------------- |
+|        GET | `/api/v1/categories` | Get Statistic    |
 
 #### `advice`
-| Метод | Путь            | Описание       |
-|------:|-----------------|----------------|
-| GET   | `/api/v1/advice`| Get Timeseries |
+
+| Метод | Путь           | Описание |
+| ---------: | ------------------ | ---------------- |
+|        GET | `/api/v1/advice` | Get Timeseries   |
 
 #### `root`
+
 | Метод | Путь | Описание |
-|------:|------|----------|
-| GET   | `/`  | Root     |
+| ---------: | -------- | ---------------- |
+|        GET | `/`    | Root             |
 
 ---
 
 ### Pydantic-схемы (раздел **Schemas** в Swagger)
+
 `CodeVerifyIn`, `CodeVerifyOut`, `EmailIn`, `HTTPValidationError`, `LoginIn`, `LogoutIn`, `RefreshIn`, `RequestCodeOut`, `SetPasswordIn`, `TokensOut`, `ValidationError`.
-
-
 
 ---
 
@@ -164,6 +173,45 @@ poetry shell
 python -m app.main
 ```
 
+## Запуск через Docker
+
+В проекте есть файл [docker-compose.yml](docker-compose.yml). Для запуска через Docker Compose выполните следующие шаги:
+
+- Создайте файл `.env` в корне проекта с переменными окружения (минимум): `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`, `APP_PORT`.
+- Пример `.env`:
+
+```bash
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=finance
+DB_PORT=5432
+APP_PORT=8000
+```
+
+- Запустить (сборка образа и запуск контейнеров):
+
+```bash
+docker compose up --build
+```
+
+или (если установлен старый плагин):
+
+```bash
+docker-compose up --build
+```
+
+- Остановить и удалить контейнеры и тома данных:
+
+```bash
+docker compose down -v
+```
+
+Примечания:
+
+- Сервис `app` зависит от `db` и использует `healthcheck` для ожидания готовности базы данных.
+- Порты для БД и приложения пробрасываются через переменные в `.env` — убедитесь, что они не конфликтуют на хосте.
+- По умолчанию в `docker-compose.yml` директория `./app` монтируется как `:ro` (только для чтения). Для локальной разработки с авто-перезагрузкой кода можно изменить монтирование на `./app:/app:rw` или настроить отдельный dev Dockerfile.
+
 ## Точки роста (после MVP)
 
 - Хранилище файлов → S3/MinIO (подписанные URL)
@@ -177,7 +225,6 @@ python -m app.main
 
 Диаграмма демонстрирует основные сценарии взаимодействия пользователя с системой: добавление расходов вручную, загрузку чеков с автоматическим извлечением данных (OCR/ML), категоризацию транзакций и получение аналитических советов.
 
-
 <table align="center">
   <tr>
     <td align="center">
@@ -186,8 +233,9 @@ python -m app.main
   </tr>
 </table>
 
-<br><br>
-<b>Варианты использования для роли «Неавторизованный пользователь»</b>
+`<br><br>`
+`<b>`Варианты использования для роли «Неавторизованный пользователь»`</b>`
+
 <table align="center">
   <tr>
     <td align="center">
@@ -196,8 +244,9 @@ python -m app.main
   </tr>
 </table>
 
-<br><br>
-<b>Варианты использования для роли «Администратор»</b>
+`<br><br>`
+`<b>`Варианты использования для роли «Администратор»`</b>`
+
 <table align="center">
   <tr>
     <td align="center">
